@@ -13,7 +13,7 @@
 namespace ExtendedFeedback\Controller;
 
 use VuFind\Exception\Mail as MailException;
-use Zend\Mail\Address;
+use Laminas\Mail\Address;
 use VuFind\Controller\FeedbackController as BasicFeedbackController;
 
 /**
