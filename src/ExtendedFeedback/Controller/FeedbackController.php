@@ -38,7 +38,7 @@ class FeedbackController extends BasicFeedbackController
     public function emailAction()
     {
         $view = $this->createViewModel();
-        $view->useRecaptcha = $this->recaptcha()->active('feedback');
+        $view->useCaptcha = $this->captcha()->active('feedback');
         $view->name = $this->params()->fromPost('name');
         $view->email = $this->params()->fromPost('email');
         $view->comments = $this->params()->fromPost('comments');
@@ -60,7 +60,7 @@ class FeedbackController extends BasicFeedbackController
 		}
 
         // Process form submission:
-        if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
+        if ($this->formWasSubmitted('submit', $view->useCaptcha)) {
             if (empty($view->email) || empty($view->comments)) {
                 $this->flashMessenger()->addMessage('bulk_error_missing', 'error');
                 return $view;
