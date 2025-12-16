@@ -27,8 +27,11 @@
  */
 namespace ExtendedFeedback\Controller;
 
-use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
+use Psr\Container\ContainerExceptionInterface as ContainerException;
+use Psr\Container\ContainerInterface;
+use VuFind\Controller\AbstractBaseFactory;
 
 /**
  * Cart controller factory.
@@ -39,7 +42,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class CartControllerFactory implements FactoryInterface
+class CartControllerFactory extends AbstractBaseFactory
 {
     /**
      * Create an object
@@ -53,17 +56,22 @@ class CartControllerFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
-        array $options = null
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
+        ?array $options = null
     ) {
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
         $session = new \Laminas\Session\Container(
-            'cart_followup', $container->get('Laminas\Session\SessionManager')
+            'cart_followup',
+            $container->get(\Laminas\Session\SessionManager::class)
         );
-        return new $requestedName($container, $session);
+        $configLoader = $container->get(\VuFind\Config\PluginManager::class);
+        $export = $container->get(\VuFind\Export::class);
+        return parent::__invoke($container, $requestedName, [$session, $configLoader, $export]);
     }
 }
