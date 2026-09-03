@@ -35,7 +35,7 @@ class FeedbackController extends BasicFeedbackController
      *
      * @return void
      */
-    public function emailAction()
+    public function formAction()
     {
         $view = $this->createViewModel();
         $view->useCaptcha = $this->captcha()->active('feedback');
