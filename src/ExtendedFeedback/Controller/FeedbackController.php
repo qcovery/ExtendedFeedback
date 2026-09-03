@@ -13,7 +13,7 @@
 namespace ExtendedFeedback\Controller;
 
 use VuFind\Exception\Mail as MailException;
-use Laminas\Mail\Address;
+use Symfony\Component\Mime\Address;
 use VuFind\Controller\FeedbackController as BasicFeedbackController;
 
 /**
