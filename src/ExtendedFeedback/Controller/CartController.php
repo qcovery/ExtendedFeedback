@@ -77,13 +77,22 @@ class CartController extends BasicCartController
             $url = $this->getServerUrl('records-home') . '?' . implode('&', $params);
 
             // Qcovery: Generate citations to add to the email message.
+            $decodeEntities = $config->Mail->decode_citation_entities ?? false;
             $citationsArray = [];
             $records = $this->getRecordLoader()->loadBatch($ids);
             foreach ($records as $record) {
                 $citation = new Citation(new \VuFind\Date\Converter());
                 $citation->setView($this->getViewRenderer());
                 $cb = $citation->__invoke($record);
-                $citationsArray[] = strip_tags($cb->getCitation('MLA'));
+                $citationText = strip_tags($cb->getCitation('MLA'));
+                if ($decodeEntities) {
+                    $citationText = html_entity_decode(
+                        $citationText,
+                        ENT_QUOTES | ENT_HTML5,
+                        'UTF-8'
+                    );
+                }
+                $citationsArray[] = $citationText;
             }
             $citationsMessage = "\n\n".implode("\n\n", $citationsArray);
             // Qcovery
