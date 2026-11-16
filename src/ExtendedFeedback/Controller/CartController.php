@@ -33,6 +33,8 @@ use function is_array;
  */
 class CartController extends BasicCartController
 {
+    use NormalizeLineEndingsTrait;
+
     /**
      * Email a batch of records.
      *
@@ -105,13 +107,21 @@ class CartController extends BasicCartController
                 $mailer->setMaxRecipients($view->maxRecipients);
                 $cc = $this->params()->fromPost('ccself') && $view->from != $view->to
                     ? $view->from : null;
-                $mailer->sendLink(
+                // Same as $mailer->sendLink(), but with normalized line endings:
+                $body = $this->getViewRenderer()->partial(
+                    'Email/share-link.phtml',
+                    [
+                        'msgUrl' => $url,
+                        'to' => $view->to,
+                        'from' => $view->from,
+                        'message' => ($view->message ?? '') . $this->getCitationsMessage($view->records),
+                    ]
+                );
+                $mailer->send(
                     $view->to,
                     $view->from,
-                    ($view->message ?? '') . $this->getCitationsMessage($view->records),
-                    $url,
-                    $this->getViewRenderer(),
-                    $view->subject,
+                    $view->subject ?? $mailer->getDefaultLinkSubject(),
+                    $this->normalizeLineEndings($body),
                     $cc
                 );
                 return $this->redirectToSource('success', 'bulk_email_success', true);

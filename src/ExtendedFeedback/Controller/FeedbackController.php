@@ -29,6 +29,8 @@ use VuFind\Controller\FeedbackController as BasicFeedbackController;
  */
 class FeedbackController extends BasicFeedbackController
 {
+    use NormalizeLineEndingsTrait;
+
     /**
      * Receives input from the user and sends an email to the recipient set in
      * the config.ini
@@ -107,7 +109,7 @@ class FeedbackController extends BasicFeedbackController
                 $mailer->send(
                     new Address($recipient_email, $recipient_name),
                     new Address($sender_email, $sender_name),
-                    $email_subject, $email_message,
+                    $email_subject, $this->normalizeLineEndings($email_message),
                     null,
                     $reply_to
                 );
